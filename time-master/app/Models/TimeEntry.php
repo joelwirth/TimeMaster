@@ -28,4 +28,12 @@ class TimeEntry extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Get the project that the time entry belongs to.
+     */
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class);
+    }
 }

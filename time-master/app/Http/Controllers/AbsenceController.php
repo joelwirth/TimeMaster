@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Absence;
+use App\Models\User;
+use App\Notifications\AbsenceRequestCreated;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 
@@ -31,12 +34,15 @@ class AbsenceController extends Controller
             'reason' => 'nullable|string',
         ]);
 
-        $request->user()->absences()->create([
+        $absence = $request->user()->absences()->create([
             'type' => $request->type,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
             'reason' => $request->reason,
         ]);
+
+        $admins = User::where('role', 'admin')->get();
+        Notification::send($admins, new AbsenceRequestCreated($absence));
 
         return Redirect::route('absences.index');
     }

@@ -7,6 +7,8 @@ import { useState } from 'react';
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
+    const { url } = usePage();
+    const isAdminPage = url.startsWith('/admin');
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
@@ -45,29 +47,11 @@ export default function AuthenticatedLayout({ header, children }) {
                                 {user.role === 'admin' && (
                                     <>
                                         <NavLink
-                                            href={route('admin.absences.index')}
-                                            active={route().current('admin.absences.index')}
-                                        >
-                                            Admin Abwesenheiten
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('admin.expenses.index')}
-                                            active={route().current('admin.expenses.index')}
-                                        >
-                                            Admin Spesen
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('admin.reports.index')}
-                                            active={route().current('admin.reports.index')}
-                                        >
-                                            Berichte
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('admin.users.index')}
-                                            active={route().current('admin.users.index')}
-                                        >
-                                            Benutzer
-                                        </NavLink>
+                                            href={route('admin.dashboard')}
+                                            active={route().current('admin.dashboard')}
+                                    >
+                                            Admin
+                                    </NavLink>
                                     </>
                                 )}
                             </div>
@@ -187,32 +171,12 @@ export default function AuthenticatedLayout({ header, children }) {
                             Spesen
                         </ResponsiveNavLink>
                         {user.role === 'admin' && (
-                            <>
-                                <ResponsiveNavLink
-                                    href={route('admin.absences.index')}
-                                    active={route().current('admin.absences.index')}
-                                >
-                                    Admin Abwesenheiten
+                            <ResponsiveNavLink
+                                href={route('admin.dashboard')}
+                                active={route().current('admin.dashboard')}
+                            >
+                                Admin
                                 </ResponsiveNavLink>
-                                <ResponsiveNavLink
-                                    href={route('admin.expenses.index')}
-                                    active={route().current('admin.expenses.index')}
-                                >
-                                    Admin Spesen
-                                </ResponsiveNavLink>
-                                <ResponsiveNavLink
-                                    href={route('admin.reports.index')}
-                                    active={route().current('admin.reports.index')}
-                                >
-                                    Berichte
-                                </ResponsiveNavLink>
-                                <ResponsiveNavLink
-                                    href={route('admin.users.index')}
-                                    active={route().current('admin.users.index')}
-                                >
-                                    Benutzer
-                                </ResponsiveNavLink>
-                            </>
                         )}
                     </div>
 
@@ -241,6 +205,22 @@ export default function AuthenticatedLayout({ header, children }) {
                     </div>
                 </div>
             </nav>
+
+            {/* Admin Sub-navigation */}
+            {isAdminPage && (
+                <nav className="bg-white shadow-sm">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex h-12 space-x-8">
+                            <NavLink href={route('admin.dashboard')} active={route().current('admin.dashboard')}>Dashboard</NavLink>
+                            <NavLink href={route('admin.users.index')} active={route().current('admin.users.index')}>Benutzer</NavLink>
+                            <NavLink href={route('admin.projects.index')} active={route().current('admin.projects.index')}>Projekte</NavLink>
+                            <NavLink href={route('admin.absences.index')} active={route().current('admin.absences.index')}>Abwesenheiten</NavLink>
+                            <NavLink href={route('admin.expenses.index')} active={route().current('admin.expenses.index')}>Spesen</NavLink>
+                            <NavLink href={route('admin.reports.index')} active={route().current('admin.reports.index')}>Berichte</NavLink>
+                        </div>
+                    </div>
+                </nav>
+            )}
 
             {header && (
                 <header className="bg-white shadow">

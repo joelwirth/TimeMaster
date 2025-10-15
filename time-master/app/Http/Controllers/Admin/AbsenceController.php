@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Absence;
+use App\Notifications\AbsenceRequestUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
@@ -32,6 +33,8 @@ class AbsenceController extends Controller
         $absence->update([
             'status' => $request->status,
         ]);
+
+        $absence->user->notify(new AbsenceRequestUpdated($absence));
 
         return Redirect::route('admin.absences.index');
     }

@@ -2,10 +2,20 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 
 export default function Index({ auth, users }) {
-    const { put, processing } = useForm();
+    const { data, setData, put, processing } = useForm({
+        role: '',
+        target_hours: '',
+        vacation_days: '',
+    });
 
-    const updateRole = (userId, newRole) => {
-        put(route('admin.users.update', { user: userId, role: newRole }), {
+    const updateRole = (user, newRole) => {
+        put(route('admin.users.update', { user: user.id, role: newRole }), {
+            preserveScroll: true,
+        });
+    };
+
+    const handleFieldChange = (user, field, value) => {
+        put(route('admin.users.update', { user: user.id, [field]: value }), {
             preserveScroll: true,
         });
     };
@@ -28,6 +38,8 @@ export default function Index({ auth, users }) {
                                             <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Name</th>
                                             <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">E-Mail</th>
                                             <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Rolle</th>
+                                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Soll-Std./Monat</th>
+                                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Urlaubstage/Jahr</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200 bg-white">
@@ -38,13 +50,31 @@ export default function Index({ auth, users }) {
                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                                     <select
                                                         value={user.role}
-                                                        onChange={(e) => updateRole(user.id, e.target.value)}
+                                                        onChange={(e) => updateRole(user, e.target.value)}
                                                         className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
                                                         disabled={processing || user.id === auth.user.id}
                                                     >
                                                         <option value="user">User</option>
                                                         <option value="admin">Admin</option>
                                                     </select>
+                                                </td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                    <input
+                                                        type="number"
+                                                        defaultValue={user.target_hours}
+                                                        onBlur={(e) => handleFieldChange(user, 'target_hours', e.target.value)}
+                                                        className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-24"
+                                                        disabled={processing}
+                                                    />
+                                                </td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                    <input
+                                                        type="number"
+                                                        defaultValue={user.vacation_days}
+                                                        onBlur={(e) => handleFieldChange(user, 'vacation_days', e.target.value)}
+                                                        className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-24"
+                                                        disabled={processing}
+                                                    />
                                                 </td>
                                             </tr>
                                         ))}

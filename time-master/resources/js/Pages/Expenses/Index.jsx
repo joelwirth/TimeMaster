@@ -7,6 +7,7 @@ export default function Index({ auth, expenses, categories }) {
         amount: '',
         expense_date: '',
         description: '',
+        receipt: null,
     });
 
     const submit = (e) => {
@@ -87,8 +88,18 @@ export default function Index({ auth, expenses, categories }) {
                                     ></textarea>
                                 </div>
 
+                                <div>
+                                    <label htmlFor="receipt">Beleg (optional)</label>
+                                    <input
+                                        id="receipt"
+                                        type="file"
+                                        className="mt-1 block w-full"
+                                        onChange={(e) => setData('receipt', e.target.files[0])}
+                                    />
+                                </div>
+
                                 <div className="flex items-center gap-4">
-                                    <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" disabled={processing}>Einreichen</button>
+                                    <Button disabled={processing}>Einreichen</Button>
                                 </div>
                             </form>
                         </section>

@@ -7,8 +7,11 @@ use App\Http\Controllers\Admin\AbsenceController as AdminAbsenceController;
 use App\Http\Controllers\Admin\ExpenseController as AdminExpenseController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\ExpenseController;
 use App\Models\TimeEntry;
+use App\Models\Project;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -25,6 +28,7 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard', [
         'activeTimeEntry' => TimeEntry::where('user_id', auth()->id())->whereNull('end_time')->first(),
+        'projects' => Project::orderBy('name')->get(),
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -45,6 +49,8 @@ Route::middleware('auth')->group(function () {
 
 // Admin Routes
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
     Route::get('/absences', [AdminAbsenceController::class, 'index'])->name('absences.index');
     Route::put('/absences/{absence}', [AdminAbsenceController::class, 'update'])->name('absences.update');
 
@@ -52,9 +58,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/expenses/{expense}', [AdminExpenseController::class, 'update'])->name('expenses.update');
 
     Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/export', [AdminReportController::class, 'export'])->name('reports.export');
 
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
+
+    Route::resource('/projects', AdminProjectController::class)->except(['show']);
 });
 
 require __DIR__.'/auth.php';

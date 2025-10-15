@@ -28,6 +28,7 @@ export default function Index({ auth, expenses }) {
                                             <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Kategorie</th>
                                             <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Betrag</th>
                                             <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
+                                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Beleg</th>
                                             <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
                                                 <span className="sr-only">Aktionen</span>
                                             </th>
@@ -41,6 +42,13 @@ export default function Index({ auth, expenses }) {
                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{expense.category.name}</td>
                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{expense.amount} €</td>
                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{expense.status}</td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                                    {expense.receipt_path && (
+                                                        <a href={`/storage/${expense.receipt_path}`} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-900">
+                                                            Ansehen
+                                                        </a>
+                                                    )}
+                                                </td>
                                                 <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                                                     {expense.status === 'pending' && (
                                                         <div className="flex gap-x-4">

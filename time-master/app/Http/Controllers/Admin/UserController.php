@@ -25,18 +25,17 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        $request->validate([
-            'role' => 'required|string|in:user,admin',
+        $validated = $request->validate([
+            'role' => 'sometimes|string|in:user,admin',
+            'target_hours' => 'sometimes|numeric|min:0',
+            'vacation_days' => 'sometimes|numeric|min:0',
         ]);
 
-        // Prevent admin from revoking their own admin role
-        if ($user->id === auth()->id() && $request->role === 'user') {
+        if ($request->has('role') && $user->id === auth()->id() && $request->role === 'user') {
             return Redirect::route('admin.users.index')->with('error', 'Sie können Ihre eigene Admin-Rolle nicht entfernen.');
         }
 
-        $user->update([
-            'role' => $request->role,
-        ]);
+        $user->update($validated);
 
         return Redirect::route('admin.users.index');
     }

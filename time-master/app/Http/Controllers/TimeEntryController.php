@@ -13,6 +13,10 @@ class TimeEntryController extends Controller
      */
     public function start(Request $request)
     {
+        $request->validate([
+            'project_id' => 'nullable|exists:projects,id',
+        ]);
+
         // Prevent creating a new entry if one is already running
         $existing = TimeEntry::where('user_id', $request->user()->id)->whereNull('end_time')->first();
         if ($existing) {
@@ -21,6 +25,7 @@ class TimeEntryController extends Controller
 
         TimeEntry::create([
             'user_id' => $request->user()->id,
+            'project_id' => $request->project_id,
             'start_time' => now(),
         ]);
 

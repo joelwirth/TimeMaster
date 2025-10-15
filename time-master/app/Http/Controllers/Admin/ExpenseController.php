@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Expense;
+use App\Notifications\ExpenseRequestUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
@@ -32,6 +33,8 @@ class ExpenseController extends Controller
         $expense->update([
             'status' => $request->status,
         ]);
+
+        $expense->user->notify(new ExpenseRequestUpdated($expense));
 
         return Redirect::route('admin.expenses.index');
     }
