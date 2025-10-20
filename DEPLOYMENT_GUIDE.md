@@ -41,8 +41,9 @@ Diese Anleitung führt Sie durch die Schritte, um die "time master"-Anwendung au
     DB_USERNAME=...
     DB_PASSWORD=...
     ```
-4.  **Setzen Sie die `APP_URL`:** Tragen Sie die endgültige URL Ihrer Anwendung ein (z.B. `https://timemaster.ihredomain.ch`).
-5.  **Generieren Sie einen App-Schlüssel:** Führen Sie diesen Befehl aus, um die Anwendung zu sichern.
+4.  **Setzen Sie die `APP_URL`:** Tragen Sie die endgültige URL Ihrer Anwendung ein (z.B. `https://app.wrtm.ch/nelius`).
+5.  **Aktivieren Sie den Unterverzeichnis-Betrieb:** Hinterlegen Sie den gewünschten Unterordner (z.B. `/nelius`) in `APP_BASE_PATH` und setzen Sie `ASSET_URL` auf die gleiche URL wie `APP_URL`. Dadurch erzeugt Laravel korrekte Link- und Asset-Pfade für das Unterverzeichnis.
+6.  **Generieren Sie einen App-Schlüssel:** Führen Sie diesen Befehl aus, um die Anwendung zu sichern.
     ```bash
     php artisan key:generate
     ```
@@ -65,10 +66,10 @@ Diese Anleitung führt Sie durch die Schritte, um die "time master"-Anwendung au
 
 ## Schritt 4: Webserver-Konfiguration
 
-Ihr Infomaniak-Hosting muss so konfiguriert werden, dass es auf das `public`-Verzeichnis innerhalb Ihres `time-master`-Projektordners zeigt.
+Ihr Infomaniak-Hosting muss so konfiguriert werden, dass Laravel die Anfragen an `index.php` weiterleiten kann.
 
-1.  Gehen Sie in Ihrem Infomaniak-Admin-Panel zu den Einstellungen Ihrer Domain/Website.
-2.  Ändern Sie das "Document Root" (Stammverzeichnis) der Website. Es sollte auf den Pfad `/path/to/your/project/time-master/public` zeigen.
+1.  Läuft die Anwendung direkt unter einer eigenen Domain, ändern Sie das "Document Root" (Stammverzeichnis) der Website auf `/path/to/your/project/time-master/public`.
+2.  Soll die Anwendung unter einer Sub-URL wie `app.wrtm.ch/nelius` erscheinen, können Sie den Document-Root Ihres Hostings unverändert lassen und stattdessen nur den Inhalt aus `public/nelius` (inkl. `.htaccess`, `index.php`, `robots.txt`, `favicon.ico` sowie dem `build`-Ordner nach dem Vite-Build) in den gewünschten Unterordner kopieren.
 3.  Stellen Sie sicher, dass die URL-Rewrite-Regeln für Laravel aktiv sind (normalerweise ist dies bei Apache-Hostings mit der mitgelieferten `.htaccess`-Datei automatisch der Fall).
 
 ## Schritt 5: Ersten Admin-Benutzer erstellen
