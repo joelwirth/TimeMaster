@@ -15,14 +15,15 @@ Diese Anleitung führt Sie durch die Schritte, um die "time master"-Anwendung au
 ## Schritt 1: Code auf den Server laden
 
 1.  Verbinden Sie sich per SSH mit Ihrem Server.
-2.  Navigieren Sie in das Verzeichnis, in dem Ihre Websites liegen (oft `~/web` oder `~/public_html`).
-3.  Klonen Sie das Projekt-Repository auf den Server:
+2.  Navigieren Sie in das Verzeichnis, in dem Ihre Websites liegen (oft `~/sites/<domain>` bei Infomaniak).
+3.  Legen Sie einen eigenen Unterordner für die Anwendung an, damit alles sauber beisammen bleibt, z.B. `~/sites/app.wrtm.ch/nelius`:
     ```bash
-    git clone <repository_url> time-master
+    mkdir -p ~/sites/app.wrtm.ch/nelius
+    cd ~/sites/app.wrtm.ch/nelius
     ```
-4.  Wechseln Sie in das Projektverzeichnis:
+4.  Klonen Sie das Projekt-Repository in diesen neuen Ordner:
     ```bash
-    cd time-master
+    git clone <repository_url> .
     ```
 
 ## Schritt 2: Konfiguration anpassen
@@ -64,7 +65,7 @@ Diese Anleitung führt Sie durch die Schritte, um die "time master"-Anwendung au
     php artisan migrate --seed
     ```
 
-## Schritt 4: Webserver-Konfiguration
+## Schritt 4: Webserver-Konfiguration & Dateien kopieren
 
 Ihr Infomaniak-Hosting muss so konfiguriert werden, dass Laravel die Anfragen an `index.php` weiterleiten kann.
 
