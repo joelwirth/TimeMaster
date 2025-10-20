@@ -15,14 +15,15 @@ Diese Anleitung führt Sie durch die Schritte, um die "time master"-Anwendung au
 ## Schritt 1: Code auf den Server laden
 
 1.  Verbinden Sie sich per SSH mit Ihrem Server.
-2.  Navigieren Sie in das Verzeichnis, in dem Ihre Websites liegen (oft `~/web` oder `~/public_html`).
-3.  Klonen Sie das Projekt-Repository auf den Server:
+2.  Navigieren Sie in das Verzeichnis, in dem Ihre Websites liegen (oft `~/sites/<domain>` bei Infomaniak).
+3.  Legen Sie einen eigenen Unterordner für die Anwendung an, damit alles sauber beisammen bleibt, z.B. `~/sites/app.wrtm.ch/nelius`:
     ```bash
-    git clone <repository_url> time-master
+    mkdir -p ~/sites/app.wrtm.ch/nelius
+    cd ~/sites/app.wrtm.ch/nelius
     ```
-4.  Wechseln Sie in das Projektverzeichnis:
+4.  Klonen Sie das Projekt-Repository in diesen neuen Ordner:
     ```bash
-    cd time-master
+    git clone <repository_url> .
     ```
 
 ## Schritt 2: Konfiguration anpassen
@@ -41,8 +42,9 @@ Diese Anleitung führt Sie durch die Schritte, um die "time master"-Anwendung au
     DB_USERNAME=...
     DB_PASSWORD=...
     ```
-4.  **Setzen Sie die `APP_URL`:** Tragen Sie die endgültige URL Ihrer Anwendung ein (z.B. `https://timemaster.ihredomain.ch`).
-5.  **Generieren Sie einen App-Schlüssel:** Führen Sie diesen Befehl aus, um die Anwendung zu sichern.
+4.  **Setzen Sie die `APP_URL`:** Tragen Sie die endgültige URL Ihrer Anwendung ein (z.B. `https://app.wrtm.ch/nelius`).
+5.  **Aktivieren Sie den Unterverzeichnis-Betrieb:** Hinterlegen Sie den gewünschten Unterordner (z.B. `/nelius`) in `APP_BASE_PATH` und setzen Sie `ASSET_URL` auf die gleiche URL wie `APP_URL`. Dadurch erzeugt Laravel korrekte Link- und Asset-Pfade für das Unterverzeichnis.
+6.  **Generieren Sie einen App-Schlüssel:** Führen Sie diesen Befehl aus, um die Anwendung zu sichern.
     ```bash
     php artisan key:generate
     ```
@@ -63,13 +65,43 @@ Diese Anleitung führt Sie durch die Schritte, um die "time master"-Anwendung au
     php artisan migrate --seed
     ```
 
-## Schritt 4: Webserver-Konfiguration
+## Schritt 4: Webserver-Konfiguration & Dateien kopieren
 
-Ihr Infomaniak-Hosting muss so konfiguriert werden, dass es auf das `public`-Verzeichnis innerhalb Ihres `time-master`-Projektordners zeigt.
+Ihr Infomaniak-Hosting muss so konfiguriert werden, dass Laravel die Anfragen an `index.php` weiterleiten kann.
 
-1.  Gehen Sie in Ihrem Infomaniak-Admin-Panel zu den Einstellungen Ihrer Domain/Website.
-2.  Ändern Sie das "Document Root" (Stammverzeichnis) der Website. Es sollte auf den Pfad `/path/to/your/project/time-master/public` zeigen.
-3.  Stellen Sie sicher, dass die URL-Rewrite-Regeln für Laravel aktiv sind (normalerweise ist dies bei Apache-Hostings mit der mitgelieferten `.htaccess`-Datei automatisch der Fall).
+1.  Läuft die Anwendung direkt unter einer eigenen Domain, ändern Sie das "Document Root" (Stammverzeichnis) der Website auf `/path/to/your/project/public`.
+2.  Für den Betrieb unter einer Sub-URL wie `app.wrtm.ch/nelius` bleibt Ihr Document-Root i.d.R. auf `~/sites/app.wrtm.ch/public` stehen. Kopieren Sie anschließend nur den Inhalt des Unterordners `public/nelius` aus dem Repository in das Zielverzeichnis auf dem Server:
+    ```bash
+    rsync -avz --delete public/nelius/ <user>@<host>:~/sites/app.wrtm.ch/public/nelius/
+    ```
+    Dabei werden ausschließlich die Front-Controller-Dateien (`.htaccess`, `index.php`, `robots.txt`, `favicon.ico`, der gebaute `build/`-Ordner sowie der `storage`-Symlink) in das öffentliche Verzeichnis gelegt. So bleibt der `public`-Ordner aufgeräumt und enthält nur einen einzigen Unterordner `nelius` für die Anwendung.
+3.  Nach dem Kopieren führen Sie im Projektordner (`~/sites/app.wrtm.ch/nelius`) einmal `php artisan storage:link` aus. Dadurch entsteht automatisch ein Symlink `~/sites/app.wrtm.ch/public/nelius/storage`, der auf `storage/app/public` im Projekt zeigt.
+4.  Stellen Sie sicher, dass die URL-Rewrite-Regeln für Laravel aktiv sind (bei Apache-Hostings übernimmt dies die mitgelieferte `.htaccess`).
+
+### Beispielstruktur auf dem Server
+
+Nach den obigen Schritten sieht die Verzeichnisstruktur typischerweise so aus und entspricht dem von Ihnen gewünschten Aufbau ohne verstreute Dateien:
+
+```
+sites/
+└── app.wrtm.ch/
+    ├── nelius/                  # komplettes Laravel-Projekt (Code, vendor, storage, ...)
+    │   ├── .env
+    │   ├── artisan
+    │   ├── public/
+    │   │   └── nelius/          # Quellordner, aus dem Sie deployen
+    │   └── ...
+    └── public/
+        ├── nelius/              # einzig benötigter Ordner im öffentlichen Verzeichnis
+        │   ├── .htaccess
+        │   ├── index.php
+        │   ├── robots.txt
+        │   ├── favicon.ico
+        │   ├── build/
+        │   └── storage -> ../../nelius/storage/app/public
+        ├── researchchecker/
+        └── die-rationale.ch/
+```
 
 ## Schritt 5: Ersten Admin-Benutzer erstellen
 
