@@ -69,39 +69,9 @@ Diese Anleitung führt Sie durch die Schritte, um die "time master"-Anwendung au
 
 Ihr Infomaniak-Hosting muss so konfiguriert werden, dass Laravel die Anfragen an `index.php` weiterleiten kann.
 
-1.  Läuft die Anwendung direkt unter einer eigenen Domain, ändern Sie das "Document Root" (Stammverzeichnis) der Website auf `/path/to/your/project/public`.
-2.  Für den Betrieb unter einer Sub-URL wie `app.wrtm.ch/nelius` bleibt Ihr Document-Root i.d.R. auf `~/sites/app.wrtm.ch/public` stehen. Kopieren Sie anschließend nur den Inhalt des Unterordners `public/nelius` aus dem Repository in das Zielverzeichnis auf dem Server:
-    ```bash
-    rsync -avz --delete public/nelius/ <user>@<host>:~/sites/app.wrtm.ch/public/nelius/
-    ```
-    Dabei werden ausschließlich die Front-Controller-Dateien (`.htaccess`, `index.php`, `robots.txt`, `favicon.ico`, der gebaute `build/`-Ordner sowie der `storage`-Symlink) in das öffentliche Verzeichnis gelegt. So bleibt der `public`-Ordner aufgeräumt und enthält nur einen einzigen Unterordner `nelius` für die Anwendung.
-3.  Nach dem Kopieren führen Sie im Projektordner (`~/sites/app.wrtm.ch/nelius`) einmal `php artisan storage:link` aus. Dadurch entsteht automatisch ein Symlink `~/sites/app.wrtm.ch/public/nelius/storage`, der auf `storage/app/public` im Projekt zeigt.
-4.  Stellen Sie sicher, dass die URL-Rewrite-Regeln für Laravel aktiv sind (bei Apache-Hostings übernimmt dies die mitgelieferte `.htaccess`).
-
-### Beispielstruktur auf dem Server
-
-Nach den obigen Schritten sieht die Verzeichnisstruktur typischerweise so aus und entspricht dem von Ihnen gewünschten Aufbau ohne verstreute Dateien:
-
-```
-sites/
-└── app.wrtm.ch/
-    ├── nelius/                  # komplettes Laravel-Projekt (Code, vendor, storage, ...)
-    │   ├── .env
-    │   ├── artisan
-    │   ├── public/
-    │   │   └── nelius/          # Quellordner, aus dem Sie deployen
-    │   └── ...
-    └── public/
-        ├── nelius/              # einzig benötigter Ordner im öffentlichen Verzeichnis
-        │   ├── .htaccess
-        │   ├── index.php
-        │   ├── robots.txt
-        │   ├── favicon.ico
-        │   ├── build/
-        │   └── storage -> ../../nelius/storage/app/public
-        ├── researchchecker/
-        └── die-rationale.ch/
-```
+1.  Läuft die Anwendung direkt unter einer eigenen Domain, ändern Sie das "Document Root" (Stammverzeichnis) der Website auf `/path/to/your/project/time-master/public`.
+2.  Soll die Anwendung unter einer Sub-URL wie `app.wrtm.ch/nelius` erscheinen, können Sie den Document-Root Ihres Hostings unverändert lassen und stattdessen nur den Inhalt aus `public/nelius` (inkl. `.htaccess`, `index.php`, `robots.txt`, `favicon.ico` sowie dem `build`-Ordner nach dem Vite-Build) in den gewünschten Unterordner kopieren.
+3.  Stellen Sie sicher, dass die URL-Rewrite-Regeln für Laravel aktiv sind (normalerweise ist dies bei Apache-Hostings mit der mitgelieferten `.htaccess`-Datei automatisch der Fall).
 
 ## Schritt 5: Ersten Admin-Benutzer erstellen
 
